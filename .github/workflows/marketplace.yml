@@ -1,0 +1,23 @@
+name: Prusa Marketplace
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Verify the build without submitting to Prusa
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: prusa3d/prusa-connect-marketplace-publish/.github/workflows/publish.yml@56dae34cf597f36239b0fefea87d07de0c91d236
+    with:
+      core-ref: v0.1.0-beta.1
+      dry-run: ${{ inputs.dry-run }}
+      channel: beta
+    secrets:
+      PRUSA_CONNECT_EXTENSION_SIGNING_KEY: ${{ secrets.PRUSA_CONNECT_EXTENSION_SIGNING_KEY }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
