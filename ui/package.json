@@ -1,0 +1,7 @@
+{
+  "name": "obico-bridge-ui",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node build.mjs" },
+  "devDependencies": { "svelte": "5.57.2" }
+}

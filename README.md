@@ -4,24 +4,26 @@ Obico Bridge runs as a native extension in Prusa Connect Local 0.1.0-beta.1. It 
 
 ## Install
 
-Download `obico-bridge-0.1.0.tar.gz` from GitHub Releases. In the deployment that runs Connect Local, install the archive with the same binary and configuration that the server uses:
+Download `obico-bridge-0.1.1.tar.gz` from GitHub Releases. In the deployment that runs Connect Local, install the archive with the same binary and configuration that the server uses:
 
 ```sh
 prusa-connect module add -config /path/to/config.yaml \
-  -from /path/to/obico-bridge-0.1.0.tar.gz -approve \
-  github.com/nilsn3dp/prusa-obico-bridge@0.1.0
+  -from /path/to/obico-bridge-0.1.1.tar.gz -approve \
+  github.com/nilsn3dp/prusa-obico-bridge@0.1.1
 ```
 
 On Unraid, place the archive in the existing Connect Local configuration mount and use the existing container:
 
 ```sh
 docker exec prusa-connect-local /app/prusa-connect-local module add \
-  -config /config/config.yaml -from /config/obico-bridge-0.1.0.tar.gz -approve \
-  github.com/nilsn3dp/prusa-obico-bridge@0.1.0
+  -config /config/config.yaml -from /config/obico-bridge-0.1.1.tar.gz -approve \
+  github.com/nilsn3dp/prusa-obico-bridge@0.1.1
 docker restart prusa-connect-local
 ```
 
 Plan the restart for when the printers are idle. Connect Local loads the extension settings on startup.
+
+After activation, open **Extensions → Obico Bridge** to see the service status.
 
 ## Configure
 

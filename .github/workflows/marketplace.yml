@@ -13,6 +13,7 @@ jobs:
     uses: prusa3d/prusa-connect-marketplace-publish/.github/workflows/publish.yml@56dae34cf597f36239b0fefea87d07de0c91d236
     with:
       core-ref: v0.1.0-beta.1
+      bundle-command: npm ci --prefix ui && npm run build --prefix ui
       dry-run: ${{ inputs.dry-run }}
       channel: beta
     secrets:

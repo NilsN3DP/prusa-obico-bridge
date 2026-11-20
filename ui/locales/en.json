@@ -1,0 +1,9 @@
+{
+  "bridge.loading": "Reading bridge status…",
+  "bridge.disabled": "Bridge disabled",
+  "bridge.ready": "Bridge active",
+  "bridge.waiting": "Bridge enabled. The service is not ready.",
+  "bridge.unavailable": "Bridge status unavailable for this session.",
+  "bridge.description": "The bridge sends active print status and camera snapshots to your separately installed Obico server.",
+  "bridge.settings": "Open bridge settings"
+}

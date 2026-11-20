@@ -2,7 +2,7 @@ name: obico-bridge
 title: Obico Bridge
 summary: Sends print status and camera snapshots to Obico for failure detection. Built on the Prusa Connect SDK by Prusa Research.
 kind: sink
-version: 0.1.0
+version: 0.1.1
 license: MIT
 contract_major: 1
 platforms:
@@ -12,6 +12,13 @@ platforms:
   - windows_amd64
 require:
   core: ">=0.1.0-beta.1"
+ui:
+  entry: ui/index.js
+  library: ">=0.0.1 <1.0.0"
+  contributes:
+    pages:
+      - path: obico-bridge
+        title: Obico Bridge
 options:
   - key: prusa_url
     type: url
