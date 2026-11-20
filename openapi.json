@@ -1,11 +1,12 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "Obico Bridge", "version": "0.1.2" },
+  "info": { "title": "Obico Bridge", "version": "0.1.3" },
   "paths": {
     "/notifications": {
       "get": {
         "operationId": "listObicoNotifications",
         "summary": "List configured Obico channels and event settings for administrators",
+        "description": "Returns existing channel names and event preferences to callers who may configure extensions.",
         "responses": {"200":{"description":"Notification channels"},"404":{"description":"Not available to this caller"},"409":{"description":"Obico API not configured"},"502":{"description":"Obico unavailable"}}
       }
     },
@@ -13,6 +14,7 @@
       "post": {
         "operationId": "setObicoNotificationEvents",
         "summary": "Change event settings for an existing Obico channel",
+        "description": "Updates event preferences on the paired Obico account without changing the channel configuration.",
         "parameters": [{"name":"channel","in":"path","required":true,"schema":{"type":"integer"}}],
         "requestBody": {"required":true,"content":{"application/json":{"schema":{"type":"object","required":["enabled","notify_on_failure_alert","notify_on_print_done","notify_on_print_start"],"properties":{
           "enabled":{"type":"boolean"},"notify_on_failure_alert":{"type":"boolean"},"notify_on_print_done":{"type":"boolean"},"notify_on_print_start":{"type":"boolean"}
@@ -24,6 +26,7 @@
       "post": {
         "operationId": "setObicoPrinterMonitoring",
         "summary": "Change AI monitoring for a mapped device",
+        "description": "Changes monitoring or alerts for a printer the caller may operate in Connect Local.",
         "parameters": [{"name":"device","in":"path","required":true,"schema":{"type":"string"}}],
         "requestBody": {"required":true,"content":{"application/json":{"schema":{
           "oneOf":[
@@ -45,6 +48,7 @@
       "get": {
         "operationId": "getObicoPrinterOverview",
         "summary": "Read Obico monitoring and recent prints for a mapped device",
+        "description": "Returns Obico detection state and recent prints for a printer visible to the caller.",
         "parameters": [{"name":"device","in":"path","required":true,"schema":{"type":"string"}}],
         "responses": {
           "200": {"description":"Obico monitoring and print history"},
@@ -57,6 +61,7 @@
       "get": {
         "operationId": "getBridgeOverview",
         "summary": "Read printer mappings and Obico connection state",
+        "description": "Lists mapped printers visible to the caller and shows whether each one is connected to Obico.",
         "responses": {
           "200": {
             "description": "Bridge overview",

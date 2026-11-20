@@ -12,7 +12,14 @@ import (
 	"github.com/prusa3d/prusa-connect/sdk/accessapi"
 	"github.com/prusa3d/prusa-connect/sdk/deviceapi"
 	"github.com/prusa3d/prusa-connect/sdk/routesapi"
+	"github.com/prusa3d/prusa-connect/sdk/wirerpc"
 )
+
+func TestDashboardOpenAPIIsAcceptedByPrusa(t *testing.T) {
+	if _, err := routesapi.Describe(wirerpc.Info{Name: name, Version: version, Contract: wirerpc.Contract}, dashboardAPI); err != nil {
+		t.Fatal(err)
+	}
+}
 
 type testAccess struct{}
 
