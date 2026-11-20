@@ -64,6 +64,8 @@ func (d *dashboard) routes(devices deviceReader, access permissionReader) http.H
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /notifications", d.notifications(access))
 	mux.HandleFunc("POST /notifications/{channel}", d.notifications(access))
+	mux.HandleFunc("GET /notification-providers", d.notifications(access))
+	mux.HandleFunc("POST /notification-providers", d.notifications(access))
 	mux.HandleFunc("GET /printers/{device}/obico", d.obicoOverview(devices, access))
 	mux.HandleFunc("POST /printers/{device}/monitoring", d.updateMonitoring(access))
 	mux.HandleFunc("GET /overview", func(w http.ResponseWriter, r *http.Request) {

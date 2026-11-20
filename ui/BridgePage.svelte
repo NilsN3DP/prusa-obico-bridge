@@ -13,6 +13,9 @@
   let channels = $state(null);
   let notificationState = $state('');
   let notificationSave = $state(null);
+  let providers = $state([]);
+  let provider = $state('');
+  let credential = $state('');
   const events = [
     'enabled', 'notify_on_failure_alert', 'notify_on_print_start', 'notify_on_print_done',
     'notify_on_print_cancelled', 'notify_on_print_pause', 'notify_on_print_resume',
@@ -47,8 +50,31 @@
     try {
       channels = await read(moduleHref + '/notifications');
       notificationState = 'ready';
+      providers = await read(moduleHref + '/notification-providers').catch(() => []);
     } catch {
       notificationState = 'unavailable';
+    }
+  }
+
+  async function addNotification(event) {
+    event.preventDefault();
+    notificationSave = 'new';
+    notificationState = 'ready';
+    try {
+      const response = await fetch(moduleHref + '/notification-providers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: provider, credential }),
+      });
+      if (!response.ok) throw new Error('Create failed');
+      provider = '';
+      credential = '';
+      channels = await read(moduleHref + '/notifications');
+      notificationState = 'created';
+    } catch {
+      notificationState = 'error';
+    } finally {
+      notificationSave = null;
     }
   }
 
@@ -299,7 +325,7 @@
       <details ontoggle={loadNotifications}>
         <summary class="cursor-pointer font-medium">{t('notifications.title')}</summary>
         <div class="space-y-4 pt-4">
-          {#if notificationState === 'loading' || notificationState === 'unavailable' || notificationState === 'saved' || notificationState === 'error'}
+          {#if ['loading', 'unavailable', 'saved', 'created', 'error'].includes(notificationState)}
             <p role="status">{t('notifications.' + notificationState)}</p>
           {/if}
           {#if channels?.length === 0}
@@ -319,6 +345,28 @@
               </Button>
             </fieldset>
           {/each}
+          {#if providers.length}
+            <form class="space-y-3 border-t pt-4" onsubmit={addNotification}>
+              <label class="flex flex-wrap items-center gap-3">
+                {t('notifications.provider')}
+                <select class="rounded-md border bg-background p-2" required bind:value={provider} onchange={() => credential = ''}>
+                  <option value="">{t('notifications.chooseProvider')}</option>
+                  {#each providers as option (option)}
+                    <option value={option}>{t('notifications.provider.' + option)}</option>
+                  {/each}
+                </select>
+              </label>
+              {#if provider && provider !== 'email'}
+                <label class="block">
+                  {t('notifications.credential.' + provider)}
+                  <input class="block w-full rounded-md border bg-background p-2" type="password" required maxlength="1024" autocomplete="off" bind:value={credential} />
+                </label>
+              {/if}
+              <Button variant="outline" size="sm" type="submit" disabled={!provider || notificationSave !== null}>
+                {t('notifications.add')}
+              </Button>
+            </form>
+          {/if}
         </div>
       </details>
     </CardContent>

@@ -23,6 +23,44 @@ func TestDashboardOpenAPIIsAcceptedByPrusa(t *testing.T) {
 
 type testAccess struct{}
 
+func TestCreateNotificationChannelValidatesProviderAndLeavesItDisabled(t *testing.T) {
+	obico := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == notificationPath+"available_plugins/" {
+			_, _ = w.Write([]byte(`{"plugins":{"discord":{},"email":{"env_vars":{"EMAIL_HOST":{"is_required":true,"is_set":false,"value":"private"}}}}}`))
+			return
+		}
+		var data map[string]any
+		if r.Method != "POST" || r.URL.Path != notificationPath ||
+			json.NewDecoder(r.Body).Decode(&data) != nil || data["name"] != "discord" || data["enabled"] != false {
+			t.Errorf("unexpected channel creation: %s %s %v", r.Method, r.URL.Path, data)
+		}
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write([]byte(`{"config":{"webhook_url":"private"}}`))
+	}))
+	defer obico.Close()
+	var dashboard dashboard
+	dashboard.configure(settings{ObicoURL: obico.URL, ObicoAccessToken: "obico-access"}, nil)
+	for _, example := range []struct {
+		method, body string
+		status       int
+	}{
+		{"GET", "", 200},
+		{"POST", `{"name":"email"}`, 400},
+		{"POST", `{"name":"discord","credential":"http://127.0.0.1/api/webhooks/123/a"}`, 400},
+		{"POST", `{"name":"discord","credential":"https://discord.com/api/webhooks/123/test"}`, 204},
+	} {
+		request, err := (routesapi.Request{Method: example.method, Path: "/notification-providers", Principal: "user:admin", Body: []byte(example.body)}).HTTP(t.Context())
+		if err != nil {
+			t.Fatal(err)
+		}
+		res := httptest.NewRecorder()
+		dashboard.routes(testDevices{}, testAccess{}).ServeHTTP(res, request)
+		if res.Code != example.status || strings.Contains(res.Body.String(), "private") {
+			t.Fatalf("%s returned %d: %s", example.method, res.Code, res.Body.String())
+		}
+	}
+}
+
 func TestTimelapseURLsStayOnTheConfiguredObicoMediaOrigin(t *testing.T) {
 	config := settings{ObicoURL: "http://127.0.0.1:3334", ObicoBrowserURL: "https://obico.example"}
 	for _, example := range []struct{ url, want string }{

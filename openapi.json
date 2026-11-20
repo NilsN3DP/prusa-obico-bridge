@@ -1,7 +1,22 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "Obico Bridge", "version": "0.1.4" },
+  "info": { "title": "Obico Bridge", "version": "0.1.5" },
   "paths": {
+    "/notification-providers": {
+      "get": {
+        "operationId":"listObicoNotificationProviders",
+        "summary":"List configured notification providers",
+        "description":"Lists supported providers whose required settings are present on the Obico server.",
+        "responses":{"200":{"description":"Provider names"},"404":{"description":"Not available to this caller"},"502":{"description":"Obico unavailable"}}
+      },
+      "post": {
+        "operationId":"createObicoNotificationChannel",
+        "summary":"Add a notification channel",
+        "description":"Creates an Obico notification channel in the disabled state so an administrator can review it before enabling delivery.",
+        "requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["name"],"properties":{"name":{"enum":["discord","email","telegram","pushover"]},"credential":{"type":"string","writeOnly":true}}}}}},
+        "responses":{"204":{"description":"Disabled channel created"},"400":{"description":"Invalid provider or credential"},"404":{"description":"Not available to this caller"},"502":{"description":"Obico rejected the channel"}}
+      }
+    },
     "/notifications": {
       "get": {
         "operationId": "listObicoNotifications",
