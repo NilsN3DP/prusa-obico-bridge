@@ -18,9 +18,9 @@ The public repository is `NilsN3DP/prusa-obico-bridge`. Prusa derives the extens
 
    ```sh
    gh workflow run marketplace.yml --repo NilsN3DP/prusa-obico-bridge \
-     --ref v0.1.5 -f dry-run=true
+     --ref v0.1.6 -f dry-run=true
    gh workflow run marketplace.yml --repo NilsN3DP/prusa-obico-bridge \
-     --ref v0.1.5 -f dry-run=false
+     --ref v0.1.6 -f dry-run=false
    ```
 
 The second run submits the release to Prusa's beta channel for review. Marketplace visibility follows approval by Prusa. [Official publishing documentation](https://github.com/prusa3d/prusa-connect-marketplace-publish)

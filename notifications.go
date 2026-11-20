@@ -31,8 +31,9 @@ func availableNotificationProviders(r *http.Request, config settings, auth strin
 	var inventory struct {
 		Plugins map[string]struct {
 			Environment map[string]struct {
-				Required bool `json:"is_required"`
-				Set      bool `json:"is_set"`
+				Required bool    `json:"is_required"`
+				Set      bool    `json:"is_set"`
+				Value    *string `json:"value"`
 			} `json:"env_vars"`
 		} `json:"plugins"`
 	}
@@ -47,7 +48,7 @@ func availableNotificationProviders(r *http.Request, config settings, auth strin
 		}
 		ready := true
 		for _, variable := range plugin.Environment {
-			if variable.Required && !variable.Set {
+			if variable.Required && (!variable.Set || (variable.Value != nil && strings.TrimSpace(*variable.Value) == "")) {
 				ready = false
 				break
 			}

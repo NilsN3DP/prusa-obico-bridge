@@ -26,7 +26,7 @@ type testAccess struct{}
 func TestCreateNotificationChannelValidatesProviderAndLeavesItDisabled(t *testing.T) {
 	obico := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == notificationPath+"available_plugins/" {
-			_, _ = w.Write([]byte(`{"plugins":{"discord":{},"email":{"env_vars":{"EMAIL_HOST":{"is_required":true,"is_set":false,"value":"private"}}}}}`))
+			_, _ = w.Write([]byte(`{"plugins":{"discord":{},"email":{"env_vars":{"EMAIL_HOST":{"is_required":true,"is_set":true,"value":""}}},"telegram":{"env_vars":{"TOKEN":{"is_required":true,"is_set":false,"value":"private"}}}}}`))
 			return
 		}
 		var data map[string]any

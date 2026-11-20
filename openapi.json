@@ -1,6 +1,6 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "Obico Bridge", "version": "0.1.5" },
+  "info": { "title": "Obico Bridge", "version": "0.1.6" },
   "paths": {
     "/notification-providers": {
       "get": {
