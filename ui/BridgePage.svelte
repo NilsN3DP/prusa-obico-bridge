@@ -96,6 +96,20 @@
     }
   }
 
+  async function testNotification(channel) {
+    notificationSave = channel.id;
+    notificationState = 'ready';
+    try {
+      const response = await fetch(moduleHref + '/notifications/' + channel.id + '/test', { method: 'POST' });
+      if (!response.ok) throw new Error('Channel test failed');
+      notificationState = 'testRequested';
+    } catch {
+      notificationState = 'testFailed';
+    } finally {
+      notificationSave = null;
+    }
+  }
+
   function select(id) {
     if (selected === id) return;
     selectionRevision++;
@@ -325,7 +339,7 @@
       <details ontoggle={loadNotifications}>
         <summary class="cursor-pointer font-medium">{t('notifications.title')}</summary>
         <div class="space-y-4 pt-4">
-          {#if ['loading', 'unavailable', 'saved', 'created', 'error'].includes(notificationState)}
+          {#if ['loading', 'unavailable', 'saved', 'created', 'error', 'testRequested', 'testFailed'].includes(notificationState)}
             <p role="status">{t('notifications.' + notificationState)}</p>
           {/if}
           {#if channels?.length === 0}
@@ -342,6 +356,9 @@
               {/each}
               <Button variant="outline" size="sm" disabled={notificationSave !== null} onclick={() => saveNotification(channel)}>
                 {t('notifications.save')}
+              </Button>
+              <Button variant="ghost" size="sm" disabled={notificationSave !== null} onclick={() => testNotification(channel)}>
+                {t('notifications.sendTest')}
               </Button>
             </fieldset>
           {/each}

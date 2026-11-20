@@ -1,4 +1,7 @@
 {
+  "notifications.sendTest": "Send test message",
+  "notifications.testRequested": "Obico accepted the test. Check the destination channel.",
+  "notifications.testFailed": "Obico could not confirm the test.",
   "notifications.provider": "Provider",
   "notifications.chooseProvider": "Select a provider",
   "notifications.provider.email": "Email",

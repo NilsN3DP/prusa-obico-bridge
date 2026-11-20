@@ -188,6 +188,30 @@ func (d *dashboard) notifications(access permissionReader) http.HandlerFunc {
 			return
 		}
 		id, err := strconv.Atoi(r.PathValue("channel"))
+		if strings.HasSuffix(r.URL.Path, "/test") {
+			if err != nil || id <= 0 {
+				http.NotFound(w, r)
+				return
+			}
+			res, err := call(r.Context(), http.MethodPost, config.ObicoURL+notificationPath+
+				strconv.Itoa(id)+"/send_test_message/", auth, "application/json", "", strings.NewReader("{}"))
+			if err != nil || res.StatusCode != http.StatusOK {
+				if res != nil {
+					res.Body.Close()
+				}
+				http.Error(w, "Obico could not test the channel", http.StatusBadGateway)
+				return
+			}
+			var reply struct {
+				Status string `json:"status"`
+			}
+			if decode(res, &reply) != nil || reply.Status != "sent" {
+				http.Error(w, "Obico did not confirm the test request", http.StatusBadGateway)
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
 		var flags notificationUpdate
 		decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024))
 		decoder.DisallowUnknownFields()

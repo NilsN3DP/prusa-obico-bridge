@@ -23,6 +23,35 @@ func TestDashboardOpenAPIIsAcceptedByPrusa(t *testing.T) {
 
 type testAccess struct{}
 
+func TestChannelTestRequiresAdministratorAndObicoConfirmation(t *testing.T) {
+	obico := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" || r.URL.Path != notificationPath+"7/send_test_message/" ||
+			r.Header.Get("Authorization") != "Bearer obico-access" {
+			t.Error("wrong Obico notification test request")
+			http.NotFound(w, r)
+			return
+		}
+		_, _ = w.Write([]byte(`{"status":"sent","secret":"private"}`))
+	}))
+	defer obico.Close()
+	var dashboard dashboard
+	dashboard.configure(settings{ObicoURL: obico.URL, ObicoAccessToken: "obico-access"}, nil)
+	for _, e := range []struct {
+		principal string
+		code      int
+	}{{"user:operator", 404}, {"user:admin", 204}} {
+		req, err := (routesapi.Request{Method: "POST", Path: "/notifications/7/test", Principal: e.principal}).HTTP(t.Context())
+		if err != nil {
+			t.Fatal(err)
+		}
+		res := httptest.NewRecorder()
+		dashboard.routes(testDevices{}, testAccess{}).ServeHTTP(res, req)
+		if res.Code != e.code || strings.Contains(res.Body.String(), "private") {
+			t.Fatalf("notification test returned %d: %s", res.Code, res.Body.String())
+		}
+	}
+}
+
 func TestCreateNotificationChannelValidatesProviderAndLeavesItDisabled(t *testing.T) {
 	obico := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == notificationPath+"available_plugins/" {

@@ -1,7 +1,16 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "Obico Bridge", "version": "0.1.6" },
+  "info": { "title": "Obico Bridge", "version": "0.1.7" },
   "paths": {
+    "/notifications/{channel}/test": {
+      "post": {
+        "operationId":"testObicoNotificationChannel",
+        "summary":"Send an Obico test message",
+        "description":"Asks Obico to deliver a test message to the selected existing channel.",
+        "parameters":[{"name":"channel","in":"path","required":true,"schema":{"type":"integer"}}],
+        "responses":{"204":{"description":"Obico accepted the test request"},"404":{"description":"Not available to this caller"},"502":{"description":"Obico did not confirm the test"}}
+      }
+    },
     "/notification-providers": {
       "get": {
         "operationId":"listObicoNotificationProviders",

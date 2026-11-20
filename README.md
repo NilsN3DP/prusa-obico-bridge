@@ -4,20 +4,20 @@ Obico Bridge runs as a native extension in Prusa Connect Local 0.1.0-beta.1. It 
 
 ## Install
 
-Download `obico-bridge-0.1.6.tar.gz` from GitHub Releases. In the deployment that runs Connect Local, install the archive with the same binary and configuration that the server uses:
+Download `obico-bridge-0.1.7.tar.gz` from GitHub Releases. In the deployment that runs Connect Local, install the archive with the same binary and configuration that the server uses:
 
 ```sh
 prusa-connect module add -config /path/to/config.yaml \
-  -from /path/to/obico-bridge-0.1.6.tar.gz -approve \
-  github.com/nilsn3dp/prusa-obico-bridge@0.1.6
+  -from /path/to/obico-bridge-0.1.7.tar.gz -approve \
+  github.com/nilsn3dp/prusa-obico-bridge@0.1.7
 ```
 
 On Unraid, place the archive in the existing Connect Local configuration mount and use the existing container:
 
 ```sh
 docker exec prusa-connect-local /app/prusa-connect-local module add \
-  -config /config/config.yaml -from /config/obico-bridge-0.1.6.tar.gz -approve \
-  github.com/nilsn3dp/prusa-obico-bridge@0.1.6
+  -config /config/config.yaml -from /config/obico-bridge-0.1.7.tar.gz -approve \
+  github.com/nilsn3dp/prusa-obico-bridge@0.1.7
 docker restart prusa-connect-local
 ```
 
@@ -56,6 +56,10 @@ After activation, open **Extensions → Obico Bridge** for the paired printers, 
 8. Set `obico_browser_url` to the Obico origin reachable by the browser if it differs from `obico_url`. Timelapse playback uses signed media links at that origin. The browser must be able to load media there.
 
 During a test print, Obico should show the job name and progress. The first snapshot follows after the next poll when the camera has a fresh image. Look for `forwarding snapshots for job` in the Connect Local logs and for predictions in the Obico print history. Paused or disconnected printers suspend image uploads.
+
+### Test a notification channel
+
+Under **Extensions → Obico Bridge → Notifications**, add a provider and enter its credential there. For Discord, use the webhook URL created for the destination channel. The bridge creates channels disabled. Use **Send test message**, check that the message arrived in the destination, then enable the events you want and save. Keep the webhook URL private.
 
 ## Build and test
 
