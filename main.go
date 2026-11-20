@@ -20,7 +20,7 @@ import (
 	"github.com/prusa3d/prusa-connect/sdk/wirerpc"
 )
 
-const name, version = "obico-bridge", "0.1.3"
+const name, version = "obico-bridge", "0.1.4"
 
 type settings struct {
 	PrusaURL         string `json:"prusa_url"`

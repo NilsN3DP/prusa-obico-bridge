@@ -23,7 +23,7 @@ docker restart prusa-connect-local
 
 Plan the restart for when the printers are idle. Connect Local loads the extension settings on startup.
 
-After activation, open **Extensions → Obico Bridge** to see the service status.
+After activation, open **Extensions → Obico Bridge** for the paired printers, camera, print progress and recent jobs.
 
 ## Configure
 
@@ -51,6 +51,9 @@ After activation, open **Extensions → Obico Bridge** to see the service status
    ```
 
 6. Save and apply Connect Local's requested restart. Enable failure detection and select **Notify** for each Obico printer.
+
+7. For Obico alerts, history, monitoring controls and notification preferences, authorize an Obico API access token for the account that owns the paired printers. Save it as `obico_access_token` in the extension's settings. Grant read access for the dashboard and write access if operators should change monitoring or notification preferences. Use Obico's OAuth setup and revoke the credential there when it is no longer needed. [Obico OAuth guide](https://www.obico.io/docs/api/api-authentication-oauth/)
+8. Set `obico_browser_url` to the Obico origin reachable by the browser if it differs from `obico_url`. Timelapse playback uses signed media links at that origin. The browser must be able to load media there.
 
 During a test print, Obico should show the job name and progress. The first snapshot follows after the next poll when the camera has a fresh image. Look for `forwarding snapshots for job` in the Connect Local logs and for predictions in the Obico print history. Paused or disconnected printers suspend image uploads.
 

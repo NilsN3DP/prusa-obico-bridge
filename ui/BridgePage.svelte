@@ -13,7 +13,11 @@
   let channels = $state(null);
   let notificationState = $state('');
   let notificationSave = $state(null);
-  const events = ['enabled', 'notify_on_failure_alert', 'notify_on_print_done', 'notify_on_print_start'];
+  const events = [
+    'enabled', 'notify_on_failure_alert', 'notify_on_print_start', 'notify_on_print_done',
+    'notify_on_print_cancelled', 'notify_on_print_pause', 'notify_on_print_resume',
+    'notify_on_filament_change', 'notify_on_heater_status',
+  ];
   let history = $state([]);
   let camera = $state('');
   let image = $state('');

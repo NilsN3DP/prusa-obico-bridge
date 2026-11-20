@@ -1,6 +1,6 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "Obico Bridge", "version": "0.1.3" },
+  "info": { "title": "Obico Bridge", "version": "0.1.4" },
   "paths": {
     "/notifications": {
       "get": {
@@ -16,8 +16,10 @@
         "summary": "Change event settings for an existing Obico channel",
         "description": "Updates event preferences on the paired Obico account without changing the channel configuration.",
         "parameters": [{"name":"channel","in":"path","required":true,"schema":{"type":"integer"}}],
-        "requestBody": {"required":true,"content":{"application/json":{"schema":{"type":"object","required":["enabled","notify_on_failure_alert","notify_on_print_done","notify_on_print_start"],"properties":{
-          "enabled":{"type":"boolean"},"notify_on_failure_alert":{"type":"boolean"},"notify_on_print_done":{"type":"boolean"},"notify_on_print_start":{"type":"boolean"}
+        "requestBody": {"required":true,"content":{"application/json":{"schema":{"type":"object","minProperties":1,"additionalProperties":false,"properties":{
+          "enabled":{"type":"boolean"},"notify_on_failure_alert":{"type":"boolean"},"notify_on_print_done":{"type":"boolean"},"notify_on_print_start":{"type":"boolean"},
+          "notify_on_print_cancelled":{"type":"boolean"},"notify_on_print_pause":{"type":"boolean"},"notify_on_print_resume":{"type":"boolean"},
+          "notify_on_filament_change":{"type":"boolean"},"notify_on_heater_status":{"type":"boolean"}
         }}}}},
         "responses": {"204":{"description":"Settings saved"},"400":{"description":"Invalid settings"},"404":{"description":"Channel unavailable"},"409":{"description":"Obico API not configured"},"502":{"description":"Obico rejected the update"}}
       }

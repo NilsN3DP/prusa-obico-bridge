@@ -1,4 +1,9 @@
 {
+  "notifications.notify_on_print_cancelled": "Print cancelled",
+  "notifications.notify_on_filament_change": "Filament change",
+  "notifications.notify_on_heater_status": "Heater status",
+  "notifications.notify_on_print_pause": "Print paused",
+  "notifications.notify_on_print_resume": "Print resumed",
   "bridge.playTimelapse": "Watch timelapse",
   "bridge.playTaggedTimelapse": "Timelapse with AI annotations",
   "bridge.closeTimelapse": "Close video",

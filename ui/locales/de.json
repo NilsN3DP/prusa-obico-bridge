@@ -1,4 +1,9 @@
 {
+  "notifications.notify_on_print_cancelled": "Druck abgebrochen",
+  "notifications.notify_on_filament_change": "Filamentwechsel",
+  "notifications.notify_on_heater_status": "Heizungsstatus",
+  "notifications.notify_on_print_pause": "Druck pausiert",
+  "notifications.notify_on_print_resume": "Druck fortgesetzt",
   "bridge.playTimelapse": "Zeitraffer ansehen",
   "bridge.playTaggedTimelapse": "Zeitraffer mit KI-Markierungen",
   "bridge.closeTimelapse": "Video schließen",
