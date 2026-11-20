@@ -2,9 +2,10 @@ name: obico-bridge
 title: Obico Bridge
 summary: Sends print status and camera snapshots to Obico for failure detection. Built on the Prusa Connect SDK by Prusa Research.
 kind: sink
-version: 0.1.1
+version: 0.1.2
 license: MIT
 contract_major: 1
+openapi: openapi.json
 platforms:
   - linux_amd64
   - linux_arm64
@@ -12,6 +13,11 @@ platforms:
   - windows_amd64
 require:
   core: ">=0.1.0-beta.1"
+  core-device.get: "*"
+  core-access.check: "*"
+checks:
+  - operate
+  - configure_resource
 ui:
   entry: ui/index.js
   library: ">=0.0.1 <1.0.0"
@@ -32,6 +38,12 @@ options:
     type: url
     required: true
     summary: Base URL of your separate Obico instance.
+  - key: obico_access_token
+    type: secret
+    summary: Optional Obico OAuth access token for failure alerts and print history.
+  - key: obico_browser_url
+    type: url
+    summary: Optional browser-reachable Obico origin for signed timelapse playback.
   - key: printers
     type: secret
     required: true

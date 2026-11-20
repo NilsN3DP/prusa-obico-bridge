@@ -13,18 +13,23 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/prusa3d/prusa-connect/sdk/accessapi"
+	"github.com/prusa3d/prusa-connect/sdk/deviceapi"
+	"github.com/prusa3d/prusa-connect/sdk/routesapi"
 	"github.com/prusa3d/prusa-connect/sdk/wire"
 	"github.com/prusa3d/prusa-connect/sdk/wirerpc"
 )
 
-const name, version = "obico-bridge", "0.1.1"
+const name, version = "obico-bridge", "0.1.2"
 
 type settings struct {
-	PrusaURL   string `json:"prusa_url"`
-	PrusaToken string `json:"prusa_token"`
-	ObicoURL   string `json:"obico_url"`
-	Printers   string `json:"printers"`
-	Interval   int    `json:"interval_seconds"`
+	PrusaURL         string `json:"prusa_url"`
+	PrusaToken       string `json:"prusa_token"`
+	ObicoURL         string `json:"obico_url"`
+	ObicoBrowserURL  string `json:"obico_browser_url"`
+	ObicoAccessToken string `json:"obico_access_token"`
+	Printers         string `json:"printers"`
+	Interval         int    `json:"interval_seconds"`
 }
 
 type mapping struct {
@@ -57,8 +62,17 @@ func (s *settings) validate() ([]mapping, error) {
 	if err != nil {
 		return nil, fmt.Errorf("obico_url: %w", err)
 	}
+	if s.ObicoBrowserURL != "" {
+		s.ObicoBrowserURL, err = origin(s.ObicoBrowserURL)
+		if err != nil {
+			return nil, fmt.Errorf("obico_browser_url: %w", err)
+		}
+	}
 	if s.Interval < 5 || s.Interval > 60 || !token.MatchString(s.PrusaToken) {
 		return nil, errors.New("set prusa_token and use an interval_seconds between 5 and 60")
+	}
+	if s.ObicoAccessToken != "" && !token.MatchString(s.ObicoAccessToken) {
+		return nil, errors.New("invalid Obico API access token")
 	}
 	var printers []mapping
 	if json.Unmarshal([]byte(s.Printers), &printers) != nil || len(printers) == 0 {
@@ -102,12 +116,13 @@ func serve() error {
 		return err
 	}
 	configured := false
+	var overview dashboard
 	methods := wirerpc.Methods{
 		wirerpc.MethodInfo: func(context.Context, wirerpc.Call) (any, error) {
-			return wirerpc.Info{
+			return routesapi.Describe(wirerpc.Info{
 				Name: name, Version: version, Contract: wirerpc.Contract,
 				Serves: []wirerpc.Method{wirerpc.MethodConfigure},
-			}, nil
+			}, dashboardAPI)
 		},
 		wirerpc.MethodShutdown: func(context.Context, wirerpc.Call) (any, error) {
 			mu.Lock()
@@ -127,8 +142,13 @@ func serve() error {
 				return errors.New("module already configured or shutting down")
 			}
 			configured = true
+			overview.configure(config, printers)
 			for _, printer := range printers {
-				workers.Go(func() { monitor(ctx, config, printer) })
+				workers.Go(func() {
+					monitor(ctx, config, printer, func(connected bool) {
+						overview.connected(printer.DeviceID, connected)
+					})
+				})
 			}
 			return nil
 		}),
@@ -137,6 +157,7 @@ func serve() error {
 	if err != nil {
 		return err
 	}
+	methods[routesapi.MethodServe] = routesapi.Serve(overview.routes(deviceapi.NewClient(conn), accessapi.NewClient(conn)))
 	return conn.Serve(context.Background())
 }
 

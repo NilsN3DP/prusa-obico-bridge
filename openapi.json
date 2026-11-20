@@ -1,0 +1,86 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Obico Bridge", "version": "0.1.2" },
+  "paths": {
+    "/notifications": {
+      "get": {
+        "operationId": "listObicoNotifications",
+        "summary": "List configured Obico channels and event settings for administrators",
+        "responses": {"200":{"description":"Notification channels"},"404":{"description":"Not available to this caller"},"409":{"description":"Obico API not configured"},"502":{"description":"Obico unavailable"}}
+      }
+    },
+    "/notifications/{channel}": {
+      "post": {
+        "operationId": "setObicoNotificationEvents",
+        "summary": "Change event settings for an existing Obico channel",
+        "parameters": [{"name":"channel","in":"path","required":true,"schema":{"type":"integer"}}],
+        "requestBody": {"required":true,"content":{"application/json":{"schema":{"type":"object","required":["enabled","notify_on_failure_alert","notify_on_print_done","notify_on_print_start"],"properties":{
+          "enabled":{"type":"boolean"},"notify_on_failure_alert":{"type":"boolean"},"notify_on_print_done":{"type":"boolean"},"notify_on_print_start":{"type":"boolean"}
+        }}}}},
+        "responses": {"204":{"description":"Settings saved"},"400":{"description":"Invalid settings"},"404":{"description":"Channel unavailable"},"409":{"description":"Obico API not configured"},"502":{"description":"Obico rejected the update"}}
+      }
+    },
+    "/printers/{device}/monitoring": {
+      "post": {
+        "operationId": "setObicoPrinterMonitoring",
+        "summary": "Change AI monitoring for a mapped device",
+        "parameters": [{"name":"device","in":"path","required":true,"schema":{"type":"string"}}],
+        "requestBody": {"required":true,"content":{"application/json":{"schema":{
+          "oneOf":[
+            {"type":"object","required":["watching"],"properties":{"watching":{"type":"boolean"}},"additionalProperties":false},
+            {"type":"object","required":["print_id","muted"],"properties":{"print_id":{"type":"integer","minimum":1},"muted":{"type":"boolean"}},"additionalProperties":false},
+            {"type":"object","required":["print_id","acknowledge"],"properties":{"print_id":{"type":"integer","minimum":1},"acknowledge":{"const":true}},"additionalProperties":false}
+          ]
+        }}}},
+        "responses": {
+          "204": {"description":"Monitoring updated"},
+          "400": {"description":"Invalid setting"},
+          "404": {"description":"No operable mapped printer"},
+          "409": {"description":"Obico API not configured or the active print or alert changed"},
+          "502": {"description":"Obico rejected the setting"}
+        }
+      }
+    },
+    "/printers/{device}/obico": {
+      "get": {
+        "operationId": "getObicoPrinterOverview",
+        "summary": "Read Obico monitoring and recent prints for a mapped device",
+        "parameters": [{"name":"device","in":"path","required":true,"schema":{"type":"string"}}],
+        "responses": {
+          "200": {"description":"Obico monitoring and print history"},
+          "404": {"description":"No visible mapped printer"},
+          "502": {"description":"Obico data could not be read"}
+        }
+      }
+    },
+    "/overview": {
+      "get": {
+        "operationId": "getBridgeOverview",
+        "summary": "Read printer mappings and Obico connection state",
+        "responses": {
+          "200": {
+            "description": "Bridge overview",
+            "content": {"application/json": {"schema": {
+              "type": "object",
+              "required": ["printers"],
+              "properties": {"printers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["device_id", "name", "connected", "obico_connected"],
+                  "properties": {
+                    "device_id": {"type": "string"},
+                    "name": {"type": "string"},
+                    "connected": {"type": "boolean"},
+                    "camera": {"type": "string"},
+                    "obico_connected": {"type": "boolean"}
+                  }
+                }
+              }}
+            }}}
+          }
+        }
+      }
+    }
+  }
+}

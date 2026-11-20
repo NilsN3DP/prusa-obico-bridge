@@ -335,7 +335,7 @@ func (b *bridge) poll(ctx context.Context, conn *websocket.Conn) (bool, error) {
 	return false, nil
 }
 
-func (b *bridge) session(ctx context.Context) error {
+func (b *bridge) session(ctx context.Context, connected func(bool)) error {
 	address := "ws" + strings.TrimPrefix(b.config.ObicoURL, "http") + "/ws/dev/"
 	dialer := websocket.Dialer{HandshakeTimeout: timeout, Proxy: http.ProxyFromEnvironment}
 	conn, res, err := dialer.DialContext(ctx, address, http.Header{"Authorization": {"bearer " + b.printer.Token}})
@@ -347,6 +347,8 @@ func (b *bridge) session(ctx context.Context) error {
 		return errors.New("Obico WebSocket connection failed")
 	}
 	defer conn.Close()
+	connected(true)
+	defer connected(false)
 	b.state.printing = false
 	conn.SetReadLimit(1 << 20)
 	done := make(chan struct{})
@@ -382,10 +384,10 @@ func (b *bridge) session(ctx context.Context) error {
 	}
 }
 
-func monitor(ctx context.Context, config settings, printer mapping) {
+func monitor(ctx context.Context, config settings, printer mapping, connected func(bool)) {
 	bridge := bridge{config: config, printer: printer}
 	for ctx.Err() == nil {
-		if err := bridge.session(ctx); err != nil && ctx.Err() == nil {
+		if err := bridge.session(ctx, connected); err != nil && ctx.Err() == nil {
 			log.Printf("[%s] %v", printer.DeviceID, err)
 		}
 		timer := time.NewTimer(time.Duration(config.Interval) * time.Second)
